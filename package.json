@@ -11,5 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "solc": "^0.6.3"
+  },
+  "devDependencies": {
+    "@types/node": "^13.7.2"
   }
 }

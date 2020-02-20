@@ -1,24 +1,49 @@
 /* eslint-disable no-console */
 const assert = require('assert');
-const ganache = require('ganache-cli'); // local ethe network
-const Web3 = require('web3'); // constructor function
+const ganache = require('ganache-cli'); // local test-net
+const web3 = require('web3');
 
-// create instance of Web3 and connect to ganache network
-const web3 = new Web3(ganache.provider());
+const { interface, bytecode } = require('../compile');
 
 
+
+// create web3 instance with ganache test net
+const Web3 = new web3(ganache.provider());
+const MILlION_WIE = '1000000'
 beforeEach(() => {
-  // ganache auto creates accounts in testing
-  // .eth is the object specifically for ethereum block chain interactions
-  // getAccounts retrieves all accounts and is async - returning a promise
-  web3.eth.getAccounts()
-    .then((fetchedAccounts) => {
-      console.log(fetchedAccounts);
-    });
-});
-
-describe('Greetings Contract', () => {
-  it('test stub', () => {
-
+  //.eth referes to eth object of web3
+  // getAccounts retrieves all acounts in the network
+  let accounts, greetings;
+  Web3.eth.getAccounts().then((accounts) => {
+    new Web3.eth.Contract(JSON.parse(interface))
+      .deploy({ data: bytecode, arguments: ['Hello World'] })
+      .send({ from: accounts[0], gas: MILlION_WIE })
+      .then((contract) => console.log(contract))
   });
-});
+
+  describe('Greetings', () => {
+    it('dummy test', () => {
+
+    });
+  });
+
+  //   Web3.eth.getAccounts()
+  //     .then((accounts) => {
+  //       return ({
+  //         contract: new Web3.eth.Contract(JSON.parse(interface)),
+  //         accounts
+  //       })
+  //     })
+  //     .then(({ accounts, contract }) => {
+  //       return ({
+  //         contract: contract.deploy({ data: bytecode, arguments: ['Hello World'] }),
+  //         accounts
+  //       })
+  //     })
+  //     .then(({ accounts, contract }) => {
+  //       return ({
+  //         contract: contract.send({ from: accounts[0], gas: MILlION_WIE })
+  //       })
+  //     })
+  //     .then(({ contract }) => console.log(contract))
+  // });

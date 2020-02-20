@@ -3,4 +3,5 @@
 ```
 solcjs --help
 ```
-Currently using version 0.4.22
+- Currently using solc version 0.4.22
+- Ganache for local test network

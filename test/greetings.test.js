@@ -10,40 +10,41 @@ const { interface, bytecode } = require('../compile');
 // create web3 instance with ganache test net
 const Web3 = new web3(ganache.provider());
 const MILlION_WIE = '1000000'
-beforeEach(() => {
+let greetings;
+
+beforeEach((done) => {
+
+  //bytecode is contract, and args is args for contract constructor
+  const deployTransactionObj = { data: bytecode, arguments: ['Hello World'] }
+
+  // 'from:' account creating contract, no 'to:' when deploying
+  // can also specify gasPrice, value, nonce
+  // const sendTransactionObj = { from: accounts[0], gas: MILlION_WIE }
+
   //.eth referes to eth object of web3
   // getAccounts retrieves all acounts in the network
-  let accounts, greetings;
   Web3.eth.getAccounts().then((accounts) => {
+    //these are nested so send has access to the first account
     new Web3.eth.Contract(JSON.parse(interface))
-      .deploy({ data: bytecode, arguments: ['Hello World'] })
+      .deploy(deployTransactionObj)
       .send({ from: accounts[0], gas: MILlION_WIE })
-      .then((contract) => console.log(contract))
+      .then((deployedContract) => {
+        greetings = deployedContract;
+        done()
+      })
   });
+});
 
-  describe('Greetings', () => {
-    it('dummy test', () => {
-
-    });
+describe('Greetings', () => {
+  it('it deploys greetings contract to a valid address', () => {
+    console.log(greetings);
+    assert.ok(greetings.options.address);
   });
+});
 
-  //   Web3.eth.getAccounts()
-  //     .then((accounts) => {
-  //       return ({
-  //         contract: new Web3.eth.Contract(JSON.parse(interface)),
-  //         accounts
-  //       })
-  //     })
-  //     .then(({ accounts, contract }) => {
-  //       return ({
-  //         contract: contract.deploy({ data: bytecode, arguments: ['Hello World'] }),
-  //         accounts
-  //       })
-  //     })
-  //     .then(({ accounts, contract }) => {
-  //       return ({
-  //         contract: contract.send({ from: accounts[0], gas: MILlION_WIE })
-  //       })
-  //     })
-  //     .then(({ contract }) => console.log(contract))
-  // });
+// accounts = await Web3.eth.getAccounts()
+// greetings = await new Web3.eth.Contract(JSON.parse(interface))
+//   .deploy(deployTransactionObj)
+//   .send({ from: accounts[0], gas: MILlION_WIE })
+
+
